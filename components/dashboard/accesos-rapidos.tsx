@@ -1,16 +1,23 @@
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, MapPin, Package } from "lucide-react"
+import { Plus, MapPin, Package, Layers } from "lucide-react"
 
 export function AccesosRapidos() {
   const accesos = [
     {
       title: "Nuevo Reparto",
-      description: "Generar un nuevo reparto",
+      description: "Generar un reparto individual",
       href: "/repartos/nuevo",
       icon: Plus,
       color: "bg-blue-600 hover:bg-blue-700",
+    },
+    {
+      title: "Reparto por Lote",
+      description: "Generar repartos masivos",
+      href: "/repartos/lote",
+      icon: Layers,
+      color: "bg-purple-600 hover:bg-purple-700",
     },
     {
       title: "Ver Mapa",
@@ -24,7 +31,7 @@ export function AccesosRapidos() {
       description: "Ver todos mis repartos",
       href: "/repartos",
       icon: Package,
-      color: "bg-purple-600 hover:bg-purple-700",
+      color: "bg-orange-600 hover:bg-orange-700",
     },
   ]
 

@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, Package, MapPin, Plus } from "lucide-react"
+import { LayoutDashboard, Package, MapPin, Plus, Layers } from "lucide-react"
 
 const navigation = [
   {
@@ -20,6 +20,11 @@ const navigation = [
     name: "Generar Reparto",
     href: "/repartos/nuevo",
     icon: Plus,
+  },
+  {
+    name: "Reparto por Lote",
+    href: "/repartos/lote",
+    icon: Layers,
   },
   {
     name: "Mapa de Rutas",
