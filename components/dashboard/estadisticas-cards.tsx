@@ -10,7 +10,7 @@ interface EstadisticasCardsProps {
 
 export function EstadisticasCards({ repartos }: EstadisticasCardsProps) {
   const hoy = new Date().toISOString().split("T")[0]
-  const repartosHoy = repartos.filter((r) => r.fecha_reparto === hoy)
+  const repartosHoy = repartos.filter((r) => r.fecha === hoy)
 
   const estadisticas = [
     {
@@ -35,8 +35,8 @@ export function EstadisticasCards({ repartos }: EstadisticasCardsProps) {
       bgColor: "bg-green-100",
     },
     {
-      title: "Planificados",
-      value: repartos.filter((r) => r.estado === "planificado").length,
+      title: "Pendientes",
+      value: repartos.filter((r) => r.estado === "pendiente").length,
       icon: Calendar,
       color: "text-purple-600",
       bgColor: "bg-purple-100",

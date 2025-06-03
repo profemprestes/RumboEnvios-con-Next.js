@@ -1,69 +1,69 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { createClient } from "@/utils/supabase/client"
 import { useAuth } from "./use-auth"
 import type { Database } from "@/types/database"
 
+type Empresa = Database["public"]["Tables"]["empresas"]["Row"]
+type Repartidor = Database["public"]["Tables"]["repartidores"]["Row"] & {
+  empresas?: Empresa
+}
 type Reparto = Database["public"]["Tables"]["repartos"]["Row"] & {
-  empresas?: Database["public"]["Tables"]["empresas"]["Row"]
+  repartidores?: Repartidor
 }
 
 export function useRepartos() {
   const [repartos, setRepartos] = useState<Reparto[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<Error | null>(null)
   const { repartidor } = useAuth()
   const supabase = createClient()
 
-  const fetchRepartos = useCallback(async () => {
-    if (!repartidor) return
+  const fetchRepartos = async () => {
+    setLoading(true)
+    setError(null)
 
     try {
-      setLoading(true)
-      setError(null)
+      if (repartidor) {
+        const { data, error } = await supabase
+          .from("repartos")
+          .select(`
+            *,
+            repartidores (
+              id,
+              nombre,
+              apellido,
+              empresas (
+                id,
+                nombre,
+                direccion
+              )
+            )
+          `)
+          .eq("repartidor_id", repartidor.id)
+          .order("fecha", { ascending: false })
 
-      const { data, error } = await supabase
-        .from("repartos")
-        .select(`
-          *,
-          empresas (
-            id,
-            nombre,
-            direccion
-          )
-        `)
-        .eq("repartidor_id", repartidor.id)
-        .order("fecha", { ascending: false })
-
-      if (error) throw error
-
-      setRepartos(data || [])
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error desconocido")
+        if (error) {
+          setError(error)
+        } else {
+          setRepartos(data as Reparto[])
+        }
+      }
+    } catch (err: any) {
+      setError(err)
     } finally {
       setLoading(false)
     }
-  }, [repartidor, supabase])
+  }
 
-  const updateRepartoEstado = async (
-    repartoId: string,
-    nuevoEstado: "pendiente" | "en_progreso" | "completado" | "cancelado",
-  ) => {
+  const updateRepartoEstado = async (id: string, estado: Database["public"]["Enums"]["estado_reparto"]) => {
     try {
-      const { error } = await supabase
-        .from("repartos")
-        .update({
-          estado: nuevoEstado,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", repartoId)
+      const { error } = await supabase.from("repartos").update({ estado }).eq("id", id)
 
       if (error) throw error
 
-      setRepartos((prev) =>
-        prev.map((reparto) => (reparto.id === repartoId ? { ...reparto, estado: nuevoEstado } : reparto)),
-      )
+      setRepartos((prev) => prev.map((reparto) => (reparto.id === id ? { ...reparto, estado } : reparto)))
 
       return { success: true }
     } catch (err) {
@@ -74,29 +74,15 @@ export function useRepartos() {
     }
   }
 
-  const getRepartosPorEstado = useCallback(
-    (estado: string) => {
-      return repartos.filter((reparto) => reparto.estado === estado)
-    },
-    [repartos],
-  )
-
-  const getRepartosHoy = useCallback(() => {
-    const hoy = new Date().toISOString().split("T")[0]
-    return repartos.filter((reparto) => reparto.fecha === hoy)
-  }, [repartos])
-
   useEffect(() => {
     fetchRepartos()
-  }, [fetchRepartos])
+  }, [repartidor])
 
   return {
     repartos,
     loading,
     error,
-    fetchRepartos,
     updateRepartoEstado,
-    getRepartosPorEstado,
-    getRepartosHoy,
+    fetchRepartos,
   }
 }

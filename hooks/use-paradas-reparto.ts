@@ -30,8 +30,9 @@ export function useParadasReparto(repartoId: string) {
           latitud_destino,
           longitud_destino,
           valor_declarado,
-          peso,
-          numero_seguimiento
+          peso_kg,
+          numero_seguimiento,
+          descripcion
         )
       `)
         .eq("reparto_id", repartoId)
@@ -58,12 +59,12 @@ export function useParadasReparto(repartoId: string) {
       }
 
       if (nuevoEstado === "en_progreso") {
-        updateData.hora_llegada = new Date().toISOString()
+        updateData.hora_real_llegada = new Date().toISOString()
       }
 
       if (nuevoEstado === "completado") {
         updateData.completada = true
-        updateData.hora_salida = new Date().toISOString()
+        updateData.hora_real_salida = new Date().toISOString()
       }
 
       const { error } = await supabase.from("paradas_reparto").update(updateData).eq("id", paradaId)
@@ -76,8 +77,8 @@ export function useParadasReparto(repartoId: string) {
             ? {
                 ...parada,
                 estado: nuevoEstado,
-                hora_llegada: updateData.hora_llegada || parada.hora_llegada,
-                hora_salida: updateData.hora_salida || parada.hora_salida,
+                hora_real_llegada: updateData.hora_real_llegada || parada.hora_real_llegada,
+                hora_real_salida: updateData.hora_real_salida || parada.hora_real_salida,
                 completada: updateData.completada || parada.completada,
               }
             : parada,
