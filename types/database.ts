@@ -162,7 +162,7 @@ export type Database = {
           direccion_destino: string
           latitud_destino: number
           longitud_destino: number
-          estado: "pendiente" | "asignado" | "en_progreso" | "completado" | "fallido" | "cancelado"
+          estado: "pendiente" | "asignado" | "en_transito" | "entregado" | "fallido"
           descripcion: string | null
           peso: number | null
           valor_declarado: number | null
@@ -170,14 +170,14 @@ export type Database = {
           fecha_entrega: string | null
           notas_entrega: string | null
           orden_parada: number | null
-          tipo_envio: "entrega" | "recogida"
-          es_parada_origen: boolean
+          tipo_envio: "origen" | "entrega" | "recogida"
+          es_parada_origen: boolean | null
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
-          numero_seguimiento: string
+          numero_seguimiento?: string
           cliente_id: string
           repartidor_id?: string | null
           reparto_id?: string | null
@@ -187,7 +187,7 @@ export type Database = {
           direccion_destino: string
           latitud_destino: number
           longitud_destino: number
-          estado?: "pendiente" | "asignado" | "en_progreso" | "completado" | "fallido" | "cancelado"
+          estado?: "pendiente" | "asignado" | "en_transito" | "entregado" | "fallido"
           descripcion?: string | null
           peso?: number | null
           valor_declarado?: number | null
@@ -195,8 +195,8 @@ export type Database = {
           fecha_entrega?: string | null
           notas_entrega?: string | null
           orden_parada?: number | null
-          tipo_envio?: "entrega" | "recogida"
-          es_parada_origen?: boolean
+          tipo_envio?: "origen" | "entrega" | "recogida"
+          es_parada_origen?: boolean | null
           created_at?: string
           updated_at?: string
         }
@@ -212,7 +212,7 @@ export type Database = {
           direccion_destino?: string
           latitud_destino?: number
           longitud_destino?: number
-          estado?: "pendiente" | "asignado" | "en_progreso" | "completado" | "fallido" | "cancelado"
+          estado?: "pendiente" | "asignado" | "en_transito" | "entregado" | "fallido"
           descripcion?: string | null
           peso?: number | null
           valor_declarado?: number | null
@@ -220,8 +220,8 @@ export type Database = {
           fecha_entrega?: string | null
           notas_entrega?: string | null
           orden_parada?: number | null
-          tipo_envio?: "entrega" | "recogida"
-          es_parada_origen?: boolean
+          tipo_envio?: "origen" | "entrega" | "recogida"
+          es_parada_origen?: boolean | null
           created_at?: string
           updated_at?: string
         }
@@ -236,7 +236,7 @@ export type Database = {
           hora_llegada: string | null
           hora_salida: string | null
           notas: string | null
-          estado: "pendiente" | "asignado" | "en_progreso" | "completado" | "fallido"
+          estado: string | null
           created_at: string
           updated_at: string
         }
@@ -249,7 +249,7 @@ export type Database = {
           hora_llegada?: string | null
           hora_salida?: string | null
           notas?: string | null
-          estado?: "pendiente" | "asignado" | "en_progreso" | "completado" | "fallido"
+          estado?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -262,7 +262,7 @@ export type Database = {
           hora_llegada?: string | null
           hora_salida?: string | null
           notas?: string | null
-          estado?: "pendiente" | "asignado" | "en_progreso" | "completado" | "fallido"
+          estado?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -272,15 +272,49 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      actualizar_orden_paradas_reparto: {
+        Args: { p_reparto_id: string; p_paradas_actualizadas: Json }
+        Returns: undefined
+      }
+      calculate_route_distance: {
+        Args: { lat1: number; lon1: number; lat2: number; lon2: number }
+        Returns: number
+      }
+      generar_reparto_lote: {
+        Args: {
+          p_repartidor_id: string
+          p_fecha: string
+          p_empresa_id: string
+          p_clientes_ids: string[]
+          p_notas?: string
+        }
+        Returns: Json
+      }
+      generate_tracking_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_current_repartidor_id: {
         Args: Record<PropertyKey, never>
-        Returns: string | null
+        Returns: string
+      }
+      get_repartidor_stats: {
+        Args: { repartidor_uuid: string }
+        Returns: Json
+      }
+      get_reparto_completo: {
+        Args: { p_reparto_id: string }
+        Returns: Json
+      }
+      get_repartos_con_detalles: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
       }
     }
     Enums: {
-      estado_envio: "pendiente" | "asignado" | "en_progreso" | "completado" | "fallido" | "cancelado"
+      estado_envio: "pendiente" | "asignado" | "en_transito" | "entregado" | "fallido"
       estado_reparto: "pendiente" | "en_progreso" | "completado" | "cancelado"
-      tipo_envio: "entrega" | "recogida"
+      tipo_envio: "origen" | "entrega" | "recogida"
     }
     CompositeTypes: {
       [_ in never]: never

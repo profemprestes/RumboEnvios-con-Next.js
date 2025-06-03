@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { createClient } from "@/utils/supabase/client"
-import { TIPOS_ENVIO, ESTADOS_ENVIO } from "@/lib/constants"
 
 interface ConfiguracionRepartoLote {
   empresaId: string
@@ -88,6 +87,7 @@ export function useGenerarRepartosLote() {
       console.log("Reparto creado:", reparto)
 
       // 2. Crear parada 0 (empresa - punto de partida)
+      // Usar "entrega" temporalmente hasta que se actualice el enum
       const { data: envioOrigen, error: envioOrigenError } = await supabase
         .from("envios")
         .insert({
@@ -98,12 +98,12 @@ export function useGenerarRepartosLote() {
           direccion_destino: empresa.direccion || "Punto de partida",
           latitud_destino: empresa.latitud_empresa || -34.6037,
           longitud_destino: empresa.longitud_empresa || -58.3816,
-          estado: ESTADOS_ENVIO.ASIGNADO,
+          estado: "asignado",
           descripcion: `Punto de partida - ${empresa.nombre}`,
           fecha_estimada: configuracion.fechaReparto,
           repartidor_id: configuracion.repartidorId,
           reparto_id: reparto.id,
-          tipo_envio: TIPOS_ENVIO.ORIGEN, // Usando el valor correcto "origen"
+          tipo_envio: "entrega", // Usando "entrega" hasta que se actualice el enum
           es_parada_origen: true,
           orden_parada: 0,
           numero_seguimiento: `ORIGEN-${reparto.id.slice(0, 8)}`,
@@ -189,12 +189,12 @@ export function useGenerarRepartosLote() {
             direccion_destino: cliente.direccion || "Destino no especificado",
             latitud_destino: Number(cliente.latitud) || -34.6037,
             longitud_destino: Number(cliente.longitud) || -58.3816,
-            estado: ESTADOS_ENVIO.ASIGNADO,
+            estado: "asignado",
             descripcion: `Entrega a ${cliente.nombre} ${cliente.apellido || ""}`,
             fecha_estimada: configuracion.fechaReparto,
             repartidor_id: configuracion.repartidorId,
             reparto_id: reparto.id,
-            tipo_envio: TIPOS_ENVIO.ENTREGA,
+            tipo_envio: "entrega",
             es_parada_origen: false,
             orden_parada: index + 1,
             numero_seguimiento: `${reparto.id.slice(0, 8)}-${String(index + 1).padStart(3, "0")}`,

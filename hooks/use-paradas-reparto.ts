@@ -8,7 +8,7 @@ type ParadaReparto = Database["public"]["Tables"]["paradas_reparto"]["Row"] & {
   envios?: Database["public"]["Tables"]["envios"]["Row"]
 }
 
-export function useParadasReparto(repartoId: number) {
+export function useParadasReparto(repartoId: string) {
   const [paradas, setParadas] = useState<ParadaReparto[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

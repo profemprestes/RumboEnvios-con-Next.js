@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/utils/supabase/client"
 import type { Database } from "@/types/database"
 
@@ -12,11 +12,15 @@ export function useClientes() {
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // Usar el cliente singleton
   const supabase = createClient()
 
-  const fetchClientes = async () => {
+  const fetchClientes = useCallback(async () => {
     try {
       setLoading(true)
+      setError(null)
+
       const { data, error } = await supabase
         .from("clientes")
         .select(`
@@ -37,15 +41,18 @@ export function useClientes() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [supabase])
 
-  const getClientesPorEmpresa = (empresaId: number) => {
-    return clientes.filter((cliente) => cliente.empresa_id === empresaId)
-  }
+  const getClientesPorEmpresa = useCallback(
+    (empresaId: string) => {
+      return clientes.filter((cliente) => cliente.empresa_id === empresaId)
+    },
+    [clientes],
+  )
 
   useEffect(() => {
     fetchClientes()
-  }, [])
+  }, [fetchClientes])
 
   return {
     clientes,

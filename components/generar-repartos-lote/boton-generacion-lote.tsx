@@ -40,7 +40,15 @@ export function BotonGeneracionLote({
           {error && (
             <Alert variant="destructive">
               <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
+              <AlertDescription>
+                <div className="space-y-2">
+                  <p className="font-medium">Error al generar el reparto:</p>
+                  <p className="text-sm">{error}</p>
+                  <p className="text-xs text-gray-600">
+                    Verifica que todos los datos estén correctos y que tengas permisos suficientes.
+                  </p>
+                </div>
+              </AlertDescription>
             </Alert>
           )}
 

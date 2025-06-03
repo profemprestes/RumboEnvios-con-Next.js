@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/utils/supabase/client"
 import { useAuth } from "./use-auth"
 import type { Database } from "@/types/database"
@@ -16,11 +16,13 @@ export function useRepartos() {
   const { repartidor } = useAuth()
   const supabase = createClient()
 
-  const fetchRepartos = async () => {
+  const fetchRepartos = useCallback(async () => {
     if (!repartidor) return
 
     try {
       setLoading(true)
+      setError(null)
+
       const { data, error } = await supabase
         .from("repartos")
         .select(`
@@ -42,11 +44,11 @@ export function useRepartos() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [repartidor, supabase])
 
   const updateRepartoEstado = async (
-    repartoId: number,
-    nuevoEstado: "planificado" | "en_progreso" | "completado" | "cancelado",
+    repartoId: string,
+    nuevoEstado: "pendiente" | "en_progreso" | "completado" | "cancelado",
   ) => {
     try {
       const { error } = await supabase
@@ -72,18 +74,21 @@ export function useRepartos() {
     }
   }
 
-  const getRepartosPorEstado = (estado: string) => {
-    return repartos.filter((reparto) => reparto.estado === estado)
-  }
+  const getRepartosPorEstado = useCallback(
+    (estado: string) => {
+      return repartos.filter((reparto) => reparto.estado === estado)
+    },
+    [repartos],
+  )
 
-  const getRepartosHoy = () => {
+  const getRepartosHoy = useCallback(() => {
     const hoy = new Date().toISOString().split("T")[0]
     return repartos.filter((reparto) => reparto.fecha === hoy)
-  }
+  }, [repartos])
 
   useEffect(() => {
     fetchRepartos()
-  }, [repartidor])
+  }, [fetchRepartos])
 
   return {
     repartos,
