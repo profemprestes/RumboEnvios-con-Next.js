@@ -31,6 +31,11 @@ const navigation = [
     href: "/mapa-rutas",
     icon: MapPin,
   },
+  {
+    name: "Debug",
+    href: "/debug",
+    icon: LayoutDashboard,
+  },
 ]
 
 export function DashboardSidebar() {

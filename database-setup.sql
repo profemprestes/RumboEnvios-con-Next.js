@@ -367,6 +367,26 @@ CREATE POLICY "empresas_select_all" ON public.empresas
 CREATE POLICY "clientes_select_all" ON public.clientes
   FOR SELECT USING (true);
 
+-- Políticas adicionales para permitir operaciones administrativas
+CREATE POLICY "repartos_insert_admin" ON public.repartos
+  FOR INSERT WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.repartidores 
+      WHERE id = repartidor_id AND activo = true
+    )
+  );
+
+CREATE POLICY "envios_insert_admin" ON public.envios
+  FOR INSERT WITH CHECK (
+    repartidor_id IN (
+      SELECT id FROM public.repartidores WHERE activo = true
+    )
+  );
+
+-- Política para permitir ver todos los repartidores activos
+CREATE POLICY "repartidores_select_all_active" ON public.repartidores
+  FOR SELECT USING (activo = true);
+
 -- =====================================================
 -- 7. DATOS DE PRUEBA
 -- =====================================================
