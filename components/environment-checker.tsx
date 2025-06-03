@@ -13,23 +13,16 @@ export function EnvironmentChecker() {
     supabaseKey: false,
   })
 
-  const [isDevelopment, setIsDevelopment] = useState(false)
-
   useEffect(() => {
-    // Verificar variables de entorno
     setEnvStatus({
       supabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
       supabaseKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     })
-
-    // Detectar si estamos en desarrollo de forma segura
-    setIsDevelopment(window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
   }, [])
 
   const allConfigured = envStatus.supabaseUrl && envStatus.supabaseKey
 
-  // Solo mostrar en desarrollo y si hay problemas de configuración
-  if (!isDevelopment && allConfigured) {
+  if (process.env.NODE_ENV === "production" && allConfigured) {
     return null
   }
 

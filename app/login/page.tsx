@@ -102,6 +102,14 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
+
+          {/* Environment variables status for debugging */}
+          {process.env.NODE_ENV === "development" && (
+            <div className="mt-4 p-2 bg-gray-100 rounded text-xs">
+              <p>Supabase URL: {process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Configurado" : "❌ No configurado"}</p>
+              <p>Supabase Key: {process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "✅ Configurado" : "❌ No configurado"}</p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
